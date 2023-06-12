@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 
 //Retorna todos os clientes
 app.get("/clientes", async () => {
-  const clientes = await prisma.user.findMany();
+  const clientes = await prisma.cliente.findMany();
 
   return { clientes };
 });
@@ -49,8 +49,10 @@ app.post("/agendas", async (request, reply) => {
   const { data, clienteId } = createAgendaSchema.parse(request.body);
 
   await prisma.agenda.create({
-    data,
-    clienteId,
+    data: {
+      data,
+      clienteId,
+    },
   });
 
   reply.status(201).send();
@@ -68,12 +70,12 @@ app.get("/agendas", async (request) => {
 //Retorna um agendamento específico
 app.get("/agendas/:agenda", async (request) => {
   const listAgendaSchema = z.object({
-    id: z.string().cuid(),
+    id: z.string().uuid(),
   });
 
   const { id } = listAgendaSchema.parse(request.params);
 
-  const agenda = await prisma.agenda.findOne({
+  const agenda = await prisma.agenda.findUnique({
     where: {
       id,
     },
@@ -82,22 +84,24 @@ app.get("/agendas/:agenda", async (request) => {
   return { agenda };
 });
 
-//Retorna agendamentos de um cliente específico
-app.get("/agendas/cliente/:cliente", async (request) => {
-  const listAgendaSchema = z.object({
-    clienteId: z.string().cuid(),
-  });
+// //Retorna agendamentos de um cliente específico
+// app.get("/agendas/cliente/:cliente", async (request) => {
+//   const listAgendaSchema = z.object({
+//     clienteId: z.string().cuid(),
+//   });
 
-  const { clienteId } = listAgendaSchema.parse(request.params);
+//   const { clienteId } = listAgendaSchema.parse(request.params);
 
-  const agendas = await prisma.agenda.findOne({
-    where: {
-      clienteId,
-    },
-  });
+//   const agendas = await prisma.agenda.findUnique({
+//     cliente: {
+//       where: {
+//         id: clienteId,
+//       },
+//     },
+//   });
 
-  return { agendas };
-});
+//   return { agendas };
+// });
 
 app
   .listen({
