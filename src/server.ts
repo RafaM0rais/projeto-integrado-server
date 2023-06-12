@@ -32,7 +32,7 @@ app.post("/clientes", async (request, reply) => {
       fullname,
       email,
       password: passwordHash,
-      cellphone,
+      cellphone: cellphone.replace(/(\D)/g, ""),
     },
   });
 
